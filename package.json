@@ -1,0 +1,12 @@
+{
+  "name": "newman-reporter",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "newman run Collection.json -e Environment.json --reporters cli,htmlextra --reporter-htmlextra-export report.html && node sendMail.js"
+  },
+  "dependencies": {
+    "newman": "^6.0.0",
+    "newman-reporter-htmlextra": "^1.22.1",
+    "nodemailer": "^6.9.0"
+  }
+}

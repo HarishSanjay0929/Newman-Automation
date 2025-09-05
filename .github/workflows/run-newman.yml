@@ -1,0 +1,28 @@
+name: Daily Newman Test
+
+on:
+  workflow_dispatch:  # allows manual trigger
+  schedule:
+   - cron: '30 0 * * *'  # every day at 10:30 AM IST
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🧪 Run Newman and Email Report
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        run: npm test
