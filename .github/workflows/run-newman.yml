@@ -1,28 +1,63 @@
-name: Daily Newman Test
+name: Enhanced Newman API Tests
 
 on:
   workflow_dispatch:  # allows manual trigger
   schedule:
    - cron: '30 0 * * *'  # every day at 10:30 AM IST
+  push:
+    branches: [ main ]
+    paths: 
+      - 'Collection.json'
+      - 'Environment.json'
+      - 'enhanced-runner.js'
+      - 'lib/**'
+      - 'config/**'
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: ⬇️ Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🟢 Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: 📦 Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: 🧪 Run Newman and Email Report
+      - name: 🧪 Run Enhanced Newman Tests
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_CC: ${{ secrets.EMAIL_CC }}
+          EMAIL_BCC: ${{ secrets.EMAIL_BCC }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          NODE_ENV: production
         run: npm test
+
+      - name: 📊 Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-test-reports-${{ github.run_number }}
+          path: |
+            reports/
+            data/
+          retention-days: 30
+
+      - name: 📈 Upload Historical Data
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-history-${{ github.run_number }}
+          path: data/test-history.json
+          retention-days: 90

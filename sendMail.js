@@ -113,15 +113,15 @@ const htmlPreview = `
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'harishsanjay.a@spantechnologyservices.com',
-    pass: 'kioz gokp qzgj enll' // Your app-specific password
+    user: process.env.EMAIL_USER || 'harishsanjay.a@spantechnologyservices.com',
+    pass: process.env.EMAIL_PASS || 'kioz gokp qzgj enll'
   }
 });
 
 // Email options
 const mailOptions = {
-  from: 'harishsanjay.a@spantechnologyservices.com',
-  to: 'dharaneesh.v@spantechnologyservices.com',
+  from: process.env.EMAIL_USER || 'harishsanjay.a@spantechnologyservices.com',
+  to: process.env.EMAIL_TO || 'dharaneesh.v@spantechnologyservices.com',
   subject: `${formTitle} - Newman API Automation Report`,
   html: htmlPreview,
   attachments: [
